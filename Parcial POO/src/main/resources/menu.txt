@@ -1,0 +1,7 @@
+Ensalada César, 15000, ENTRADA
+Sopa del día, 12000, ENTRADA
+Pasta Carbonara, 25000, PLATO_FUERTE
+Filet Mignon, 35000, PLATO_FUERTE
+Agua mineral, 5000, BEBIDA
+Jugo natural, 7000, BEBIDA
+Tiramisú, 10000, POSTRE
