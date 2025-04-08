@@ -1,0 +1,145 @@
+@startuml RestaurantSystemDiagram
+
+' Paquete principal
+package "com.restaurant" {
+    class Main {
+        +main(String[] args)
+    }
+}
+
+' Adaptadores de consola
+package "com.restaurant.application.console" {
+    class ConsoleMenu {
+        +showMainMenu()
+    }
+    class OrderConsoleAdapter {
+        +createOrder()
+        +showActiveOrders()
+        +closeOrder()
+        +markOrderAsDelivered()
+        +cancelOrder()
+    }
+    class ProductConsoleAdapter {
+        +showAllProducts()
+        +showProductsByCategory()
+        +addNewProduct()
+        +updateProduct()
+        +deleteProduct()
+    }
+}
+
+' Archivo de carga de productos
+package "com.restaurant.application.file" {
+    class FileProductLoader {
+        +loadProducts(fileName)
+    }
+}
+
+' Modelo de dominio
+package "com.restaurant.domain.model" {
+    class Product {
+        -name: String
+        -price: double
+        -category: String
+        +getName()
+        +getPrice()
+        +getCategory()
+    }
+
+    class Coupon {
+        -code: String
+        -discountValue: double
+        -discountPercent: double
+        +getPercentAsDecimal()
+    }
+
+    class Order {
+        -id: UUID
+        -tableNumber: int
+        -items: List
+        -status: OrderStatus
+        -total: double
+        +addItem(Product, int)
+        +applyDiscount(double)
+        +calculateTotal()
+        +changeStatus(OrderStatus)
+        +printDetails()
+    }
+
+    class OrderItem {
+        -product: Product
+        -quantity: int
+        +getSubtotal()
+    }
+
+    enum OrderStatus {
+        CREATED
+        IN_PROGRESS
+        DELIVERED
+        CLOSED
+        CANCELLED
+    }
+}
+
+' Repositorios
+package "com.restaurant.domain.repository" {
+    interface ProductRepository {
+        +save(Product)
+        +findAll()
+    }
+
+    interface OrderRepository {
+        +save(Order)
+        +findById(UUID)
+        +findAll()
+    }
+
+    interface CouponRepository {
+        +findByCode(String)
+        +getAllCoupons()
+    }
+}
+
+' Servicios de dominio
+package "com.restaurant.domain.service" {
+    class DiscountService {
+        +getCouponByCode(String)
+        +applyDiscount(double, String)
+    }
+}
+
+' Infraestructura
+package "com.restaurant.infrastructure" {
+    class InMemoryProductRepository
+    class InMemoryOrderRepository
+    class InMemoryCouponRepository
+}
+
+' Casos de uso
+package "com.restaurant.usecase" {
+    class ProductUseCase
+    class OrderUseCase {
+        +createOrder(int)
+        +addItemToOrder(UUID, Product, int)
+        +closeOrder(UUID, String)
+        +cancelOrder(UUID)
+        +getActiveOrders()
+    }
+}
+
+' Relaciones
+Main --> ConsoleMenu
+ConsoleMenu --> OrderConsoleAdapter
+ConsoleMenu --> ProductConsoleAdapter
+FileProductLoader --> ProductRepository
+
+DiscountService --> CouponRepository
+OrderUseCase --> OrderRepository
+OrderUseCase --> DiscountService
+OrderUseCase --> CouponRepository
+
+InMemoryProductRepository ..|> ProductRepository
+InMemoryOrderRepository ..|> OrderRepository
+InMemoryCouponRepository ..|> CouponRepository
+
+@enduml
